@@ -3,6 +3,7 @@
 #include <string.h>
 #include <omp.h>
 #include <assert.h>
+#include <algorithm>
 
 #define SWAP(a,b) {int tmp = a; a = b; b = tmp;}
 #define SIZE 1024
@@ -30,30 +31,28 @@ int main(int argc, char** argv) {
 
   //sort
 //  mergesort(a, size, temp);
-#pragma omp parallel
+#pragma omp parallel default(none) num_threads(4) shared(a, size, temp)
   {
 #pragma omp sections
     {
 #pragma omp section
       {
-        mergesort(a, size / 4, temp);
+        std::sort(&a[0], &a[size / 4]);
       }
 #pragma omp section
       {
-        mergesort(a + size / 4, size / 4, temp + size / 4);
+        std::sort(&a[size / 4], &a[2 * size / 4]);
       }
 #pragma omp section
       {
-        mergesort(a + 2 * size / 4, size / 4, temp + 2 * size / 4);
+        std::sort(&a[2 * size / 4], &a[3 * size / 4]);
       }
 #pragma omp section
       {
-        mergesort(a + 3 * size / 4, size / 4, temp + 3 * size / 4);
+        std::sort(&a[3 * size / 4], &a[size]);
       }
-    }
-  }
-#pragma omp parallel
-  {
+    } // barriere implicite
+
 #pragma omp sections
     {
 #pragma omp section
@@ -64,9 +63,10 @@ int main(int argc, char** argv) {
       {
         merge(a + size / 2, size / 2, temp + size / 2);
       }
-    }
-  }
-  merge(a, size, temp);
+    } // barriere implicite
+  } // fin region parallele
+
+  merge(temp, size, a);
 
   verify(a, size);
 }
