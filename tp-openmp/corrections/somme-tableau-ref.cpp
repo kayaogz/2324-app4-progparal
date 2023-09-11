@@ -11,7 +11,7 @@ int main()
   double somme = 0.0;
 
   auto start = std::chrono::high_resolution_clock::now();
-#pragma omp parallel
+#pragma omp parallel default(none) num_threads(4) shared(somme, A, N, i)
   {
 #pragma omp for
     for (i = 0; i < N; i++) {
@@ -23,34 +23,35 @@ int main()
 //    for (i = 0; i < N; i++) {
 //      somme += A[i];
 //    }
+    
 #pragma omp sections
     {
 #pragma omp section
       {
         double sommeLocale = 0;
         for (int i = 0; i < N / 4; i++) { sommeLocale += A[i]; }
-#pragma omp critical
-        somme += sommeLocale;
+#pragma omp atomic
+          somme += sommeLocale;
       }
 #pragma omp section
       {
         double sommeLocale = 0;
         for (int i = N / 4; i < (2 * N) / 4; i++) { sommeLocale += A[i]; }
-#pragma omp critical
+#pragma omp atomic
         somme += sommeLocale;
       }
 #pragma omp section
       {
         double sommeLocale = 0;
         for (int i = (2 * N) / 4; i < (3 * N) / 4; i++) { sommeLocale += A[i]; }
-#pragma omp critical
+#pragma omp atomic
         somme += sommeLocale;
       }
 #pragma omp section
       {
         double sommeLocale = 0;
         for (int i = (3 * N) / 4; i < N; i++) { sommeLocale += A[i]; }
-#pragma omp critical
+#pragma omp atomic
         somme += sommeLocale;
       }
     }
