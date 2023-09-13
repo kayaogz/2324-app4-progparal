@@ -22,7 +22,9 @@ inline float produitScalaire(float *A, float *B, int taille)
 
 inline float produitScalaireAVX(float *A, float *B, int taille)
 {
-  __m256 res = _mm256_set1_ps(0.0f);
+  float tab[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  __mm256 res = _mm256_load_ps(tab);
+//  __m256 res = _mm256_set1_ps(0.0f);
   for (size_t i = 0; i < taille; i += 8) {
     __m256 la = _mm256_load_ps(A + i);
     __m256 lb = _mm256_load_ps(B + i);
