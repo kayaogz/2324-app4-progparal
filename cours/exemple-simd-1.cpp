@@ -34,9 +34,9 @@ int main()
   __m256i vec4, vec5, vec6;
   vec4 = _mm256_loadu_si256((__m256i *)&Aint[0]);
   vec5 = _mm256_loadu_si256((__m256i *)&Bint[0]);
-//  vec6 = _mm256_add_epi32(vec4, vec5);
+  vec6 = _mm256_add_epi32(vec4, vec5);
 //  vec6 = _mm256_sub_epi32(vec4, vec5);
-  vec6 = _mm256_mullo_epi32(vec4, vec5);
+//  vec6 = _mm256_mullo_epi32(vec4, vec5);
   _mm256_storeu_si256((__m256i *)&Cint[0], vec6);
 
   for (int i = 0; i < 8; i++) {
